@@ -26,7 +26,7 @@ var app = (function () {
         var ctx = canvas.getContext("2d");
         var point = new Point(x,y);
         stompClient.send("/app/newpoint."+drawingNumber, {}, JSON.stringify(point));
-        
+
 
     };
     
@@ -39,6 +39,13 @@ var app = (function () {
             y: evt.clientY - rect.top
         };
     };
+
+    var getRndColor= function() {
+        var r = 255*Math.random()|0,
+            g = 255*Math.random()|0,
+            b = 255*Math.random()|0;
+        return 'rgb(' + r + ',' + g + ',' + b + ')';
+    }
 
 
     var connectAndSubscribe = function () {
@@ -55,6 +62,26 @@ var app = (function () {
                 var point = new Point(x,y);
                 addPointToCanvas(point);
             });
+            stompClient.subscribe('/topic/newpolygon.'+drawingNumber, function (eventbody) {
+                var canvas = document.getElementById("canvas");
+                var ctx = canvas.getContext("2d");
+                var point0 = null;
+                ctx.fillStyle = getRndColor();
+                ctx.beginPath();
+                (JSON.parse(eventbody.body)).map(function (elem, index) {
+                    if(index === 0){
+                        point0 = elem;
+                        ctx.moveTo(elem.x, elem.y);
+                    }else{
+                        ctx.lineTo(elem.x, elem.y);
+                        if(index === (JSON.parse(eventbody.body)).length){
+                            ctx.lineTo(poin0.x, point0.y);
+                        }
+                    }
+                })
+                ctx.closePath();
+                ctx.fill();
+            })
         });
 
     };
