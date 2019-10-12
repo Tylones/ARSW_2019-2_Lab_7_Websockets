@@ -26,9 +26,7 @@ var app = (function () {
         var ctx = canvas.getContext("2d");
         var point = new Point(x,y);
         stompClient.send("/app/newpoint."+drawingNumber, {}, JSON.stringify(point));
-        ctx.beginPath();
-        ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
-        ctx.stroke();
+        
 
     };
     
