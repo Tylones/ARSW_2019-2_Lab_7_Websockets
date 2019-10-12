@@ -16,6 +16,19 @@ var app = (function () {
         ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
         ctx.stroke();
     };
+
+    var clickAddPoint = function (canvas, event){
+        var rect = canvas.getBoundingClientRect()
+        var x = event.clientX - rect.left
+        var y = event.clientY - rect.top
+        var ctx = canvas.getContext("2d");
+        var point = new Point(x,y);
+        stompClient.send("/app/newpoint", {}, JSON.stringify(point));
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
+        ctx.stroke();
+
+    };
     
     
     var getMousePosition = function (evt) {
@@ -37,8 +50,10 @@ var app = (function () {
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/newpoint', function (eventbody) {
-                alert((JSON.parse(eventbody.body)).content);
-                
+                var x = (JSON.parse(eventbody.body)).x;
+                var y = (JSON.parse(eventbody.body)).y;
+                var point = new Point(x,y);
+                addPointToCanvas(point);
             });
         });
 
@@ -49,7 +64,19 @@ var app = (function () {
     return {
 
         init: function () {
-            var can = document.getElementById("canvas");
+            var canvas = document.getElementById("canvas");
+
+            if(window.PointerEvent) {
+                canvas.addEventListener("pointerdown", function(e){
+                    clickAddPoint(canvas, e)
+                });
+            }
+            else {
+                canvas.addEventListener("mousedown", function(event){
+                    clickAddPoint(canvas, e)
+                });
+            }
+
             
             //websocket connection
             connectAndSubscribe();

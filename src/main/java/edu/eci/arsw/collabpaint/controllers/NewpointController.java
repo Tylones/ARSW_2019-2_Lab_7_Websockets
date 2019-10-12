@@ -13,9 +13,9 @@ public class NewpointController {
 
     @MessageMapping("/newpoint")
     @SendTo("/topic/newpoint")
-    public TestResponse test(Point p) throws Exception {
+    public Point test(Point p) throws Exception {
 
-        return new TestResponse("Hello 123");
+        return p;
     }
 
 }
