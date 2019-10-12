@@ -1,5 +1,7 @@
 var app = (function () {
 
+    var drawingNumber = null;
+
     class Point{
         constructor(x,y){
             this.x=x;
@@ -23,7 +25,7 @@ var app = (function () {
         var y = event.clientY - rect.top
         var ctx = canvas.getContext("2d");
         var point = new Point(x,y);
-        stompClient.send("/app/newpoint", {}, JSON.stringify(point));
+        stompClient.send("/app/newpoint."+drawingNumber, {}, JSON.stringify(point));
         ctx.beginPath();
         ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
         ctx.stroke();
@@ -49,7 +51,7 @@ var app = (function () {
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/newpoint', function (eventbody) {
+            stompClient.subscribe('/topic/newpoint.'+drawingNumber, function (eventbody) {
                 var x = (JSON.parse(eventbody.body)).x;
                 var y = (JSON.parse(eventbody.body)).y;
                 var point = new Point(x,y);
@@ -78,8 +80,6 @@ var app = (function () {
             }
 
             
-            //websocket connection
-            connectAndSubscribe();
         },
 
         publishPoint: function(px,py){
@@ -88,15 +88,21 @@ var app = (function () {
             addPointToCanvas(pt);
 
             //publicar el evento
-            stompClient.send("/app/newpoint", {}, JSON.stringify(pt));
+            stompClient.send("/app/newpoint."+drawingNumber, {}, JSON.stringify(pt));
         },
 
         disconnect: function () {
             if (stompClient !== null) {
                 stompClient.disconnect();
             }
+            drawingNumber = null;
             setConnected(false);
             console.log("Disconnected");
+        },
+
+        connect: function () {
+            drawingNumber = document.getElementById("dNumber").value;
+            connectAndSubscribe();
         }
     };
 

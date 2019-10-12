@@ -30,9 +30,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     
     <body onload="app.init()">
+    <div class="row">
         X:<input id="x" type="number"/>
-        Y:<input id="y" type="number"/>        
+        Y:<input id="y" type="number"/>
         <button onclick="app.publishPoint($('#x').val(),$('#y').val())">Send point</button>
         <canvas id="canvas" width="800" height="600" style="border: 1px black solid"></canvas>
+    </div>
+    <div class="row">
+        <input type="text" class="form-control" placeholder="Drawing number" id="dNumber">
+        <button type="button" class="btn btn-secondary" onclick="app.connect()">Connection</button>
+    </div>
     </body>
 </html>
