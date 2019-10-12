@@ -20,14 +20,16 @@ var app = (function () {
     };
 
     var clickAddPoint = function (canvas, event){
-        var rect = canvas.getBoundingClientRect()
-        var x = event.clientX - rect.left
-        var y = event.clientY - rect.top
-        var ctx = canvas.getContext("2d");
-        var point = new Point(x,y);
-        stompClient.send("/app/newpoint."+drawingNumber, {}, JSON.stringify(point));
-
-
+        if(stompClient === null){
+            alert('Connect to a specific drawing before drawing');
+        }else{
+            var rect = canvas.getBoundingClientRect()
+            var x = event.clientX - rect.left
+            var y = event.clientY - rect.top
+            var ctx = canvas.getContext("2d");
+            var point = new Point(x,y);
+            stompClient.send("/app/newpoint."+drawingNumber, {}, JSON.stringify(point));
+        }
     };
     
     
@@ -45,7 +47,7 @@ var app = (function () {
             g = 255*Math.random()|0,
             b = 255*Math.random()|0;
         return 'rgb(' + r + ',' + g + ',' + b + ')';
-    }
+    };
 
 
     var connectAndSubscribe = function () {
@@ -62,6 +64,7 @@ var app = (function () {
                 var point = new Point(x,y);
                 addPointToCanvas(point);
             });
+
             stompClient.subscribe('/topic/newpolygon.'+drawingNumber, function (eventbody) {
                 var canvas = document.getElementById("canvas");
                 var ctx = canvas.getContext("2d");
