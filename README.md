@@ -105,4 +105,4 @@ and the last window is connected to the drawing 2.
 As a result, the first two windows do have the same polygons (the colors are generated randomly when 
 drawing, and are not shared), and the last window has different polygons.
 
-[final](img/final.png)  
+[!final](img/final.png)  
